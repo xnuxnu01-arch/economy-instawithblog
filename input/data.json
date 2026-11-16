@@ -1,108 +1,236 @@
 
 {
-  "schema_version": "2.0",
-  "content_type": "stock_analysis",
-  "market_date": "",
-  "market": "US",
-  "stock": {
-    "company_name": "",
-    "ticker": "",
-    "exchange": "",
-    "sector": "",
-    "industry": "",
-    "current_price": null,
-    "currency": "USD",
-    "price_as_of": "",
-    "company_description": ""
-  },
-  "hook": {
-    "headline": "",
-    "subheadline": "",
-    "curiosity_question": ""
-  },
-  "business_model": {
-    "simple_explanation": "",
-    "main_products": [],
-    "revenue_sources": []
-  },
-  "financial_metrics": [
-    {
-      "name": "매출액",
-      "value": null,
-      "unit": "",
-      "period": "",
-      "growth_rate": null,
-      "source": "",
-      "source_url": ""
-    },
-    {
-      "name": "영업이익률",
-      "value": null,
-      "unit": "%",
-      "period": "",
-      "source": "",
-      "source_url": ""
-    },
-    {
-      "name": "PER",
-      "value": null,
-      "unit": "배",
-      "period": "",
-      "source": "",
-      "source_url": ""
-    }
-  ],
-  "investment_points": [],
-  "risks": [],
-  "competitors": [],
-  "pages": {
-    "page1": {
-      "title": "",
-      "subtitle": "",
-      "key_message": ""
-    },
-    "page2": {
-      "title": "",
-      "simple_explanation": "",
-      "key_message": ""
-    },
-    "page3": {
-      "title": "",
-      "metrics": [],
-      "key_message": ""
-    },
-    "page4": {
-      "title": "",
-      "risks": [],
-      "key_message": ""
-    },
-    "page5": {
-      "title": "",
-      "positive_factors": [],
-      "negative_factors": [],
-      "final_comment": ""
+  "schema_version": "3.0",
+  "content_id": "YYYYMMDD-001",
+  "status": "draft",
+
+  "brand": {
+    "name": "ECONOMY & LIFE",
+    "tagline": "돈의 흐름을 읽고, 삶을 기록하다.",
+    "tone": "전문적이지만 친근하게",
+    "design": {
+      "economy": "black-gold",
+      "lifestyle": "editorial-photo",
+      "instagram_width": 1080,
+      "instagram_height": 1350
     }
   },
+
+  "content": {
+    "category": "economy",
+    "subcategory": "stock",
+    "content_type": "analysis",
+    "topic": "",
+    "target_audience": "경제와 재테크에 관심 있는 일반 독자",
+    "primary_goal": "search_traffic",
+    "publish_targets": [
+      "naver_blog",
+      "instagram"
+    ]
+  },
+
+  "research": {
+    "reference_date": "",
+    "research_status": "not_started",
+    "key_facts": [],
+    "statistics": [],
+    "sources": [
+      {
+        "name": "",
+        "publisher": "",
+        "published_at": "",
+        "url": "",
+        "supports": ""
+      }
+    ],
+    "warnings": []
+  },
+
+  "seo": {
+    "main_keyword": "",
+    "related_keywords": [],
+    "search_intent": "",
+    "blog_title": "",
+    "meta_description": "",
+    "hashtags": []
+  },
+
   "blog": {
     "title": "",
     "introduction": "",
-    "business_overview": "",
-    "financial_analysis": "",
-    "growth_prospects": "",
-    "competitor_analysis": "",
-    "investment_risks": "",
+    "sections": [
+      {
+        "heading": "",
+        "body": "",
+        "image_brief": "",
+        "table": null
+      }
+    ],
+    "summary": "",
     "conclusion": "",
-    "references": []
+    "call_to_action": "",
+    "image_briefs": [],
+    "tags": [],
+    "disclosure": ""
   },
+
   "instagram": {
+    "format": "carousel",
+    "slide_count": 4,
+    "slides": [
+      {
+        "page": 1,
+        "role": "hook",
+        "title": "",
+        "body": "",
+        "highlight": ""
+      },
+      {
+        "page": 2,
+        "role": "information",
+        "title": "",
+        "body": "",
+        "highlight": ""
+      },
+      {
+        "page": 3,
+        "role": "analysis",
+        "title": "",
+        "body": "",
+        "highlight": ""
+      },
+      {
+        "page": 4,
+        "role": "summary",
+        "title": "",
+        "body": "",
+        "highlight": ""
+      }
+    ],
     "caption": "",
-    "hashtags": []
+    "hashtags": [],
+    "blog_link_text": "자세한 내용은 블로그에서 확인하세요."
   },
-  "data_quality": {
-    "verification_status": "",
-    "missing_data": [],
-    "warnings": [],
-    "last_verified_at": ""
+
+  "monetization": {
+    "affiliate": false,
+    "affiliate_products": [],
+    "sponsorship": false,
+    "commercial_relationship": "",
+    "disclosure": ""
   },
-  "disclaimer": "본 콘텐츠는 투자 참고 자료이며 투자 판단과 책임은 투자자 본인에게 있습니다."
+
+  "quality_control": {
+    "facts_verified": false,
+    "numeric_sources_verified": false,
+    "source_urls_checked": false,
+    "advertising_disclosure_checked": false,
+    "image_reviewed": false,
+    "final_review": false,
+    "warnings": []
+  },
+
+  "publishing": {
+    "naver_blog": {
+      "status": "draft",
+      "url": ""
+    },
+    "instagram": {
+      "status": "draft",
+      "url": ""
+    }
+  },
+
+  "analytics": {
+    "blog_views": null,
+    "search_visits": null,
+    "instagram_reach": null,
+    "instagram_saves": null,
+    "profile_visits": null,
+    "affiliate_clicks": null,
+    "revenue": null
+  },
+
+  "disclaimer": {
+    "investment": "본 콘텐츠는 정보 제공 및 투자 참고 목적으로 작성되었으며, 투자 판단과 책임은 투자자 본인에게 있습니다.",
+    "commercial": "광고, 협찬 및 제휴 관계가 있는 콘텐츠는 관련 법령에 따라 명확하게 표시합니다."
+  },
+
+  "market_date": "작성일 입력",
+
+  "news_top3": [
+    {
+      "title": "첫 번째 핵심 내용",
+      "summary": "첫 번째 내용 요약"
+    },
+    {
+      "title": "두 번째 핵심 내용",
+      "summary": "두 번째 내용 요약"
+    },
+    {
+      "title": "세 번째 핵심 내용",
+      "summary": "세 번째 내용 요약"
+    }
+  ],
+
+  "page1": {
+    "title": "오늘의 핵심 콘텐츠",
+    "subtitle": "ECONOMY & LIFE",
+    "intro": "핵심 정보를 쉽게 전달합니다.",
+    "news_summary": [
+      {
+        "title": "핵심 내용 1",
+        "summary": "핵심 내용 설명"
+      },
+      {
+        "title": "핵심 내용 2",
+        "summary": "핵심 내용 설명"
+      },
+      {
+        "title": "핵심 내용 3",
+        "summary": "핵심 내용 설명"
+      }
+    ]
+  },
+
+  "page2": {
+    "title": "핵심 이슈 분석",
+    "news_title": "주요 주제",
+    "summary": "핵심 내용 설명",
+    "what_happened": "주요 사실",
+    "background": "배경 설명",
+    "impact": "경제적 또는 생활 속 영향",
+    "watch_point": "앞으로 확인할 사항",
+    "source": "자료 출처 및 기준일"
+  },
+
+  "page3": {
+    "title": "추가로 알아둘 내용",
+    "news": [
+      {
+        "title": "추가 내용 1",
+        "summary": "핵심 설명",
+        "impact": "영향 및 의미"
+      },
+      {
+        "title": "추가 내용 2",
+        "summary": "핵심 설명",
+        "impact": "영향 및 의미"
+      }
+    ]
+  },
+
+  "page4": {
+    "title": "오늘의 핵심 정리",
+    "key_points": [
+      "핵심 요점 1",
+      "핵심 요점 2",
+      "핵심 요점 3"
+    ],
+    "watch_points": [
+      "다음에 확인할 사항 1",
+      "다음에 확인할 사항 2"
+    ],
+    "final_message": "더 자세한 내용은 블로그에서 확인하세요."
+  }
 }
