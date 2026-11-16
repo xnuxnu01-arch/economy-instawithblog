@@ -11,12 +11,26 @@ const WIDTH = 1080;
 const HEIGHT = 1350;
 const COUNT = 4;
 
+// ------------------------------
+// 기본 유틸리티
+// ------------------------------
+
 function str(value, fallback = "") {
-  if (value === null || value === undefined) return fallback;
-  if (Array.isArray(value)) {
-    return value.map(v => str(v)).filter(Boolean).join(" · ");
+  if (value === null || value === undefined) {
+    return fallback;
   }
-  if (typeof value === "object") return fallback;
+
+  if (Array.isArray(value)) {
+    return value
+      .map(v => str(v))
+      .filter(Boolean)
+      .join(" · ");
+  }
+
+  if (typeof value === "object") {
+    return fallback;
+  }
+
   return String(value).trim() || fallback;
 }
 
@@ -29,8 +43,12 @@ function esc(value) {
     .replace(/'/g, "&#39;");
 }
 
+// ------------------------------
+// 슬라이드 데이터
+// ------------------------------
+
 function getSlide(data, index) {
-  const slides = data.instagram.slides || [];
+  const slides = data.instagram?.slides || [];
 
   const slide =
     slides.find(item => Number(item.page) === index + 1) ||
@@ -38,7 +56,7 @@ function getSlide(data, index) {
     {};
 
   const sections =
-    data.blog && Array.isArray(data.blog.sections)
+    Array.isArray(data.blog?.sections)
       ? data.blog.sections
       : [];
 
@@ -47,33 +65,48 @@ function getSlide(data, index) {
 
   const titles = [
     str(
-      data.blog && data.blog.title,
+      data.blog?.title,
       str(
-        data.seo && data.seo.blog_title,
-        str(data.content && data.content.topic, legacy.title)
+        data.seo?.blog_title,
+        str(data.content?.topic, legacy.title)
       )
     ),
-    str(section.heading, str(legacy.news_title, legacy.title)),
-    str(section.heading, str(data.content && data.content.topic, legacy.title)),
+
     str(
-      data.blog && data.blog.summary,
-      str(data.blog && data.blog.conclusion, legacy.title)
+      section.heading,
+      str(legacy.news_title, legacy.title)
+    ),
+
+    str(
+      section.heading,
+      str(data.content?.topic, legacy.title)
+    ),
+
+    str(
+      data.blog?.summary,
+      str(data.blog?.conclusion, legacy.title)
     )
   ];
 
   const bodies = [
     str(
-      data.blog && data.blog.introduction,
-      str(data.blog && data.blog.summary, legacy.intro)
+      data.blog?.introduction,
+      str(data.blog?.summary, legacy.intro)
     ),
-    str(section.body, str(legacy.summary, legacy.what_happened)),
+
     str(
       section.body,
-      str(data.blog && data.blog.conclusion, legacy.impact)
+      str(legacy.summary, legacy.what_happened)
     ),
+
     str(
-      data.blog && data.blog.summary,
-      str(data.blog && data.blog.conclusion, legacy.final_message)
+      section.body,
+      str(data.blog?.conclusion, legacy.impact)
+    ),
+
+    str(
+      data.blog?.summary,
+      str(data.blog?.conclusion, legacy.final_message)
     )
   ];
 
@@ -92,40 +125,158 @@ function getSlide(data, index) {
   ];
 
   return {
-    title: str(slide.title, titles[index] || defaultTitles[index]),
-    body: str(slide.body, bodies[index] || defaultBodies[index]),
+    title: str(
+      slide.title,
+      titles[index] || defaultTitles[index]
+    ),
+
+    body: str(
+      slide.body,
+      bodies[index] || defaultBodies[index]
+    ),
+
     highlight: str(slide.highlight, "")
   };
 }
 
+// ------------------------------
+// 핵심 숫자 자동 추출
+// ------------------------------
+
+function getMetrics(data, index) {
+  const statistics = Array.isArray(data.research?.statistics)
+    ? data.research.statistics
+    : [];
+
+  // 2번 카드: 첫 번째부터 최대 3개
+  // 3번 카드: 네 번째부터 최대 3개
+
+  if (index !== 1 && index !== 2) {
+    return [];
+  }
+
+  const start = index === 1 ? 0 : 3;
+
+  return statistics
+    .filter(item => {
+      return (
+        item &&
+        typeof item === "object" &&
+        item.label !== undefined &&
+        item.value !== undefined &&
+        item.value !== null &&
+        String(item.label).trim() !== "" &&
+        String(item.value).trim() !== "" &&
+        item.verified !== false
+      );
+    })
+    .slice(start, start + 3)
+    .map(item => ({
+      label: String(item.label),
+      value: String(item.value),
+      unit: item.unit ? String(item.unit) : "",
+      period: item.period ? String(item.period) : "",
+      source: item.source ? String(item.source) : ""
+    }));
+}
+
+// ------------------------------
+// 숫자 카드 HTML 생성
+// ------------------------------
+
+function makeMetricCards(metrics) {
+  if (!metrics.length) {
+    return "";
+  }
+
+  return `
+    <div class="metrics">
+
+      ${metrics.map(metric => `
+        <div class="metric-card">
+
+          <div class="metric-label">
+            ${esc(metric.label)}
+          </div>
+
+          <div class="metric-value">
+            ${esc(metric.value)}
+            <span>${esc(metric.unit)}</span>
+          </div>
+
+          ${
+            metric.period
+              ? `
+                <div class="metric-period">
+                  ${esc(metric.period)}
+                </div>
+              `
+              : ""
+          }
+
+          ${
+            metric.source
+              ? `
+                <div class="metric-source">
+                  출처: ${esc(metric.source)}
+                </div>
+              `
+              : ""
+          }
+
+        </div>
+      `).join("")}
+
+    </div>
+  `;
+}
+
+// ------------------------------
+// 이미지 URL 검사
+// ------------------------------
+
 function safeImageUrl(data) {
   const value = str(
-    data.content && data.content.cover_image_url,
-    str(data.blog && data.blog.cover_image_url, "")
+    data.content?.cover_image_url,
+    str(data.blog?.cover_image_url, "")
   );
 
   try {
     const url = new URL(value);
+
     return ["https:", "http:"].includes(url.protocol)
       ? url.href
       : "";
+
   } catch {
     return "";
   }
 }
 
+// ------------------------------
+// HTML 생성
+// ------------------------------
+
 function makeHtml(data, index, theme) {
   const slide = getSlide(data, index);
+  const metrics = getMetrics(data, index);
 
   const date = str(
-    data.research && data.research.reference_date,
-    str(data.market_date, new Date().toISOString().slice(0, 10))
+    data.research?.reference_date,
+    str(
+      data.market_date,
+      new Date().toISOString().slice(0, 10)
+    )
   );
 
   const page = String(index + 1).padStart(2, "0");
+
   const cover = index === 0;
   const summary = index === 3;
-  const imageUrl = cover ? safeImageUrl(data) : "";
+
+  const imageUrl = cover
+    ? safeImageUrl(data)
+    : "";
 
   const coverBackground = imageUrl
     ? `
@@ -136,6 +287,7 @@ function makeHtml(data, index, theme) {
           rgba(15,35,52,.82)
         ),
         url('${esc(imageUrl)}');
+
       background-size: cover;
       background-position: center;
     `
@@ -165,9 +317,14 @@ function makeHtml(data, index, theme) {
 
   let main = "";
 
+  // ------------------------------
+  // 1번 카드: 표지
+  // ------------------------------
+
   if (cover) {
     main = `
       <div class="cover" style="${coverBackground}">
+
         <div class="cover-label">
           ${esc(theme.tagline)}
         </div>
@@ -179,6 +336,7 @@ function makeHtml(data, index, theme) {
         <div class="cover-sub">
           ${esc(slide.body.slice(0, 160))}
         </div>
+
       </div>
     `;
 
@@ -191,6 +349,11 @@ function makeHtml(data, index, theme) {
     }
 
   } else {
+
+    // ------------------------------
+    // 2~4번 카드: 본문
+    // ------------------------------
+
     const labels = [
       "",
       "KEY INFORMATION",
@@ -199,7 +362,9 @@ function makeHtml(data, index, theme) {
     ];
 
     main = `
-      <h1>${esc(slide.title)}</h1>
+      <h1>
+        ${esc(slide.title)}
+      </h1>
 
       <div class="panel">
 
@@ -222,14 +387,21 @@ function makeHtml(data, index, theme) {
 
     main += "</div>";
 
+    // 핵심 숫자 카드 추가
+    main += makeMetricCards(metrics);
+
+    // ------------------------------
+    // 4번 카드: 핵심 정리
+    // ------------------------------
+
     if (summary) {
       const takeaway1 = str(
-        data.blog && data.blog.summary,
+        data.blog?.summary,
         slide.title
       );
 
       const takeaway2 = str(
-        data.blog && data.blog.conclusion,
+        data.blog?.conclusion,
         slide.body.slice(0, 100)
       );
 
@@ -251,11 +423,16 @@ function makeHtml(data, index, theme) {
     }
   }
 
+  // ------------------------------
+  // CSS 및 최종 HTML
+  // ------------------------------
+
   return `
 <!DOCTYPE html>
 <html lang="ko">
 
 <head>
+
 <meta charset="UTF-8">
 
 <style>
@@ -510,6 +687,100 @@ h1 {
   z-index: 2;
 }
 
+/* 핵심 숫자 카드 */
+
+.metrics {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 16px;
+
+  margin-top: 28px;
+
+  position: relative;
+  z-index: 2;
+}
+
+.metric-card {
+  min-height: 190px;
+
+  padding: 24px 18px;
+
+  border-radius: 20px;
+
+  background: #FFFFFF;
+
+  border: 1px solid #DCE9E8;
+
+  box-shadow:
+    0 8px 24px rgba(33,65,77,.06);
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  min-width: 0;
+}
+
+.metric-label {
+  font-size: 20px;
+
+  font-weight: 800;
+
+  color: #71838D;
+
+  margin-bottom: 18px;
+
+  word-break: keep-all;
+}
+
+.metric-value {
+  font-size: 37px;
+
+  font-weight: 900;
+
+  line-height: 1.2;
+
+  letter-spacing: -1.5px;
+
+  color: #176D78;
+
+  word-break: break-word;
+
+  overflow-wrap: anywhere;
+}
+
+.metric-value span {
+  font-size: 21px;
+
+  margin-left: 3px;
+
+  letter-spacing: 0;
+}
+
+.metric-period {
+  font-size: 17px;
+
+  color: #71838D;
+
+  margin-top: 12px;
+
+  word-break: keep-all;
+}
+
+.metric-source {
+  font-size: 13px;
+
+  color: #9AA7AC;
+
+  margin-top: 8px;
+
+  word-break: keep-all;
+}
+
 .takeaways {
   margin-top: 30px;
 
@@ -588,6 +859,7 @@ ${imageUrl ? `
 ` : ""}
 
 </style>
+
 </head>
 
 <body>
@@ -629,9 +901,14 @@ ${imageUrl ? `
 </div>
 
 </body>
+
 </html>
 `;
 }
+
+// ------------------------------
+// 데이터 검증
+// ------------------------------
 
 function validate(data) {
   if (
@@ -639,7 +916,9 @@ function validate(data) {
     typeof data !== "object" ||
     Array.isArray(data)
   ) {
-    throw new Error("data.json은 JSON 객체여야 합니다.");
+    throw new Error(
+      "data.json은 JSON 객체여야 합니다."
+    );
   }
 
   if (
@@ -651,11 +930,29 @@ function validate(data) {
       "instagram.slides에 최소 4개의 슬라이드가 필요합니다."
     );
   }
+
+  if (
+    data.research?.statistics !== undefined &&
+    !Array.isArray(data.research.statistics)
+  ) {
+    throw new Error(
+      "research.statistics는 배열이어야 합니다."
+    );
+  }
 }
 
+// ------------------------------
+// 기존 이미지 삭제
+// ------------------------------
+
 function cleanOldFiles() {
-  fs.mkdirSync(OUTPUT, { recursive: true });
-  fs.mkdirSync(RENDERED, { recursive: true });
+  fs.mkdirSync(OUTPUT, {
+    recursive: true
+  });
+
+  fs.mkdirSync(RENDERED, {
+    recursive: true
+  });
 
   for (let i = 1; i <= COUNT; i++) {
 
@@ -682,6 +979,10 @@ function cleanOldFiles() {
   }
 }
 
+// ------------------------------
+// 메인 렌더링
+// ------------------------------
+
 async function main() {
   console.log(
     "ECONOMY & LIFE · Bright Editorial Renderer"
@@ -705,7 +1006,7 @@ async function main() {
   validate(data);
 
   const key = str(
-    data.content && data.content.category,
+    data.content?.category,
     "economy"
   ).toLowerCase();
 
@@ -724,12 +1025,12 @@ async function main() {
       labels[key] || "ECONOMY & FINANCE",
 
     brand: str(
-      data.brand && data.brand.name,
+      data.brand?.name,
       "ECONOMY & LIFE"
     ),
 
     tagline: str(
-      data.brand && data.brand.tagline,
+      data.brand?.tagline,
       "돈의 흐름을 읽고, 삶을 기록하다."
     )
   };
@@ -740,6 +1041,31 @@ async function main() {
     "| 디자인: Bright Editorial"
   );
 
+  const statistics = Array.isArray(data.research?.statistics)
+    ? data.research.statistics
+    : [];
+
+  console.log(
+    "등록된 통계:",
+    statistics.length,
+    "개"
+  );
+
+  console.log(
+    "표시 가능한 검증 수치:",
+    statistics.filter(
+      item =>
+        item &&
+        typeof item === "object" &&
+        item.label &&
+        item.value !== undefined &&
+        item.value !== null &&
+        String(item.value).trim() !== "" &&
+        item.verified !== false
+    ).length,
+    "개"
+  );
+
   cleanOldFiles();
 
   const browser = await chromium.launch({
@@ -747,7 +1073,6 @@ async function main() {
   });
 
   try {
-
     const page = await browser.newPage({
       viewport: {
         width: WIDTH,
@@ -757,15 +1082,12 @@ async function main() {
       deviceScaleFactor: 1
     });
 
-    page.on(
-      "pageerror",
-      error => {
-        console.error(
-          "브라우저 오류:",
-          error.message
-        );
-      }
-    );
+    page.on("pageerror", error => {
+      console.error(
+        "브라우저 오류:",
+        error.message
+      );
+    });
 
     for (let i = 0; i < COUNT; i++) {
 
@@ -798,10 +1120,7 @@ async function main() {
       );
 
       await page.evaluate(async () => {
-        if (
-          document.fonts &&
-          document.fonts.ready
-        ) {
+        if (document.fonts?.ready) {
           await document.fonts.ready;
         }
       });
@@ -832,13 +1151,17 @@ async function main() {
     }
 
     console.log(
-      "새 실행에서 생성된 이미지 4장 확인 완료"
+      "이미지 4장 생성 완료"
     );
 
   } finally {
     await browser.close();
   }
 }
+
+// ------------------------------
+// 실행 및 오류 처리
+// ------------------------------
 
 main().catch(error => {
   console.error(
