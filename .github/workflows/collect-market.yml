@@ -1,0 +1,30 @@
+
+name: Collect KRX Market Data
+
+on:
+  workflow_dispatch:
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Collect KRX market data
+        run: node scripts/collect_market.js
+        env:
+          KRX_API_KEY: ${{ secrets.KRX_API_KEY }}
+
+      - name: Upload market data
+        uses: actions/upload-artifact@v4
+        with:
+          name: krx-market-data
+          path: data/market_data.json
+          if-no-files-found: error
